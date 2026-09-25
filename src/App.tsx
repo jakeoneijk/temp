@@ -1,10 +1,13 @@
 import React from 'react'
+import './App.css'
 
 import { paperContent } from './Config/PaperContent'
+import { dialogueContinuation } from './Config/VideoContent'
 
 import Title from './Component/Title'
 import AudioTable from './Source/AudioTable'
 import Section from './Component/Section'
+import VideoSection from './Component/VideoSection'
 
 const style = {
   display: 'flex',
@@ -16,13 +19,10 @@ function App() {
   return (
     <div className='App' style={style}>
       <Title />
-      {paperContent.abstract.trim() ? (
+      {paperContent.abstract.trim() && (
         <Section name='Abstract' content={paperContent.abstract} />
-      ) : (
-        <p style={{ margin: '40px 24px', textAlign: 'center', color: '#5f6368' }}>
-          More content will be added in future updates.
-        </p>
       )}
+      <VideoSection {...dialogueContinuation} />
       <AudioTable audioType='Sound Effect' />
       <AudioTable audioType='Music' />
       <AudioTable audioType='Speech' />
@@ -34,6 +34,9 @@ function App() {
             .join(' \n ')}
         />
       )}
+      <p className='content-update'>
+        More content will be added.
+      </p>
     </div>
   )
 }

@@ -1,0 +1,14 @@
+.content-update {
+  box-sizing: border-box;
+  width: min(1064px, calc(100% - 40px));
+  margin: 32px 20px 64px;
+  padding: 24px 20px;
+  border: 1px solid #dce4ef;
+  border-radius: 10px;
+  background: #f3f6fa;
+  color: #263c56;
+  font-size: clamp(18px, 2vw, 20px);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}

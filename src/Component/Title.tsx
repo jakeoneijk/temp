@@ -5,8 +5,8 @@ import Button from './Button'
 
 const titleContainerStyle = {
   marginTop: '60px',
-  marginLeft: '65px',
-  marginRight: '65px',
+  marginLeft: 'clamp(20px, 5vw, 65px)',
+  marginRight: 'clamp(20px, 5vw, 65px)',
 }
 
 const paperInfoStyle = {
@@ -21,7 +21,7 @@ const titleStyle = {
   textAlign: 'center' as 'center',
   fontFamily: 'Trebuchet MS, sans-serif',
   fontWeight: 600,
-  fontSize: '35px',
+  fontSize: 'clamp(26px, 4.5vw, 35px)',
 }
 
 const authorStyle = {
