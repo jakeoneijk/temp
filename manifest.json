@@ -1,0 +1,8 @@
+{
+  "short_name": "CSDLM",
+  "name": "Continuous Spoken Dialogue Language Models",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
