@@ -2,12 +2,12 @@ import React from 'react'
 import './App.css'
 
 import { paperContent } from './Config/PaperContent'
-import { dialogueContinuation } from './Config/VideoContent'
+import { dialogueContinuation } from './Config/DialogueContent'
 
 import Title from './Component/Title'
 import AudioTable from './Source/AudioTable'
 import Section from './Component/Section'
-import VideoSection from './Component/VideoSection'
+import DialogueAudioSection from './Component/DialogueAudioSection'
 
 const style = {
   display: 'flex',
@@ -22,7 +22,7 @@ function App() {
       {paperContent.abstract.trim() && (
         <Section name='Abstract' content={paperContent.abstract} />
       )}
-      <VideoSection {...dialogueContinuation} />
+      <DialogueAudioSection {...dialogueContinuation} />
       <AudioTable audioType='Sound Effect' />
       <AudioTable audioType='Music' />
       <AudioTable audioType='Speech' />

@@ -1,0 +1,301 @@
+{
+  "audio": "01.wav",
+  "sample_rate": 16000,
+  "duration_sec": 39.98,
+  "prompt_end_sec": 17.0,
+  "layout": "0-17.0 s is the real conversation from 01.mp4; after it dGSLM generates both channels. left = speaker A, right = speaker B",
+  "text_source": "Whisper large-v3 + stable-ts per channel (the dialogue-continuation evaluator's transcribe.py)",
+  "transcript": "A: What kind of car did you win?\nB: Well,\nB: I can't keep it because I can't afford the tax,\nA: Yeah.\nB: but it's a $2,000 three-fourth focus.\nA: Oh, really?\nB: So I'm just going to trade it in.\nA: That's cool, man.\nB: Yeah, trade it in.\nA: Congratulations.\nB: So\nA: That's awesome.\nB: it was a pretty good day.\nA: Yeah.\nB: I saw this number.\nA: Well, how did it...\nB: I'm like, what?\nA: What was the first thing happening with you?\nB: Every weekend, but I can't keep on herself.\nA: Yeah.\nB: Because I'll have an experience in ultimate deli.\nA: That's awesome.\nA: And the other day, I was thinking of you,\nA: and no one can you walk on it.\nA: You're up at the end of stuff.\nB: Yeah, I say today.\nA: You really?\nA: Yeah, man.\nA: I mean,\nB: Go out this weekend\nA: I'm talking,\nB: and I'm overseas.\nA: Javier,\nA: do you ever watch Mobius,\nA: Gussendanger,\nA: what kind of near acceptable,\nB: You know,\nA: so on?\nB: when it was her family problem,",
+  "segments": [
+    {
+      "speaker": "A",
+      "start": 0.3,
+      "end": 1.28,
+      "text": "What kind of car did you win?",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 1.49,
+      "end": 1.94,
+      "text": "Well,",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 2.24,
+      "end": 3.76,
+      "text": "I can't keep it because I can't afford the tax,",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 2.3,
+      "end": 4.2,
+      "text": "Yeah.",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 3.9,
+      "end": 5.96,
+      "text": "but it's a $2,000 three-fourth focus.",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 4.96,
+      "end": 6.82,
+      "text": "Oh, really?",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 7.34,
+      "end": 8.34,
+      "text": "So I'm just going to trade it in.",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 7.48,
+      "end": 8.06,
+      "text": "That's cool, man.",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 8.42,
+      "end": 9.36,
+      "text": "Yeah, trade it in.",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 8.58,
+      "end": 9.16,
+      "text": "Congratulations.",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 10.112,
+      "end": 10.32,
+      "text": "So",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 10.688,
+      "end": 11.72,
+      "text": "That's awesome.",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 11.64,
+      "end": 13.14,
+      "text": "it was a pretty good day.",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 12.42,
+      "end": 13.62,
+      "text": "Yeah.",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 13.82,
+      "end": 15.24,
+      "text": "I saw this number.",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 14.48,
+      "end": 15.18,
+      "text": "Well, how did it...",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 15.84,
+      "end": 16.26,
+      "text": "I'm like, what?",
+      "generated": false
+    },
+    {
+      "speaker": "A",
+      "start": 15.872,
+      "end": 17.98,
+      "text": "What was the first thing happening with you?",
+      "generated": false
+    },
+    {
+      "speaker": "B",
+      "start": 18.848,
+      "end": 21.26,
+      "text": "Every weekend, but I can't keep on herself.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 19.08,
+      "end": 19.872,
+      "text": "Yeah.",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 22.1,
+      "end": 24.82,
+      "text": "Because I'll have an experience in ultimate deli.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 24.096,
+      "end": 24.44,
+      "text": "That's awesome.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 24.54,
+      "end": 25.76,
+      "text": "And the other day, I was thinking of you,",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 25.78,
+      "end": 27.5,
+      "text": "and no one can you walk on it.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 27.52,
+      "end": 28.34,
+      "text": "You're up at the end of stuff.",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 28.99,
+      "end": 30.04,
+      "text": "Yeah, I say today.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 29.02,
+      "end": 29.28,
+      "text": "You really?",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 30.28,
+      "end": 30.8,
+      "text": "Yeah, man.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 30.98,
+      "end": 31.78,
+      "text": "I mean,",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 31.54,
+      "end": 31.98,
+      "text": "Go out this weekend",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 31.8,
+      "end": 32.08,
+      "text": "I'm talking,",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 31.98,
+      "end": 32.46,
+      "text": "and I'm overseas.",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 32.14,
+      "end": 32.36,
+      "text": "Javier,",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 32.44,
+      "end": 33.27,
+      "text": "do you ever watch Mobius,",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 33.34,
+      "end": 33.72,
+      "text": "Gussendanger,",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 33.74,
+      "end": 34.54,
+      "text": "what kind of near acceptable,",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 34.496,
+      "end": 37.46,
+      "text": "You know,",
+      "generated": true
+    },
+    {
+      "speaker": "A",
+      "start": 34.88,
+      "end": 35.26,
+      "text": "so on?",
+      "generated": true
+    },
+    {
+      "speaker": "B",
+      "start": 38.48,
+      "end": 39.7,
+      "text": "when it was her family problem,",
+      "generated": true
+    }
+  ],
+  "source": {
+    "source": "ipynb/demo_speech_continuation/scripts/rank1_price_is_right.wav",
+    "prompt_in_source_sec": [
+      0.0,
+      30.0
+    ],
+    "window_in_source_sec": [
+      13.0,
+      53.0
+    ],
+    "dgslm": "comparisons/dgslm/inferencer.py both_channel, temperature 1.0",
+    "vocoder_speaker_ids": {
+      "c1": 58,
+      "c2": 29
+    },
+    "prompt_audio": "tmp/dialogue_continuation/ours/01.wav 0-17.0 s, resampled to 16000 Hz"
+  }
+}
