@@ -54,6 +54,84 @@ function waveformPath(peaks: readonly number[], center: number) {
   }).join(' ')
 }
 
+type WaveformChannel = { label: string; detail?: string; color: string }
+
+// Shared by continuation and generation. Each real audio channel gets one lane;
+// generation has no prompt boundary or synthetic caption timestamps.
+export function DialogueWaveform({ peaks, time, duration, label, channels, promptEnd,
+  compact = false, reserveStereoHeight = false, onSeek, onToggle }: {
+  peaks: readonly (readonly number[])[]
+  time: number
+  duration: number
+  label: string
+  channels: readonly WaveformChannel[]
+  promptEnd?: number
+  compact?: boolean
+  reserveStereoHeight?: boolean
+  onSeek: (time: number) => void
+  onToggle: () => void
+}) {
+  const clipId = useId().replace(/:/g, '')
+  const channelCount = peaks.length
+  const height = Math.max(channelCount, reserveStereoHeight ? 2 : 1) * 78
+  const laneHeight = height / Math.max(channelCount, 1)
+  const progress = duration > 0 ? clamp(time / duration, 1) : 0
+  const hasPrompt = promptEnd !== undefined && promptEnd > 0 && promptEnd < duration
+  const promptPercent = hasPrompt ? promptEnd / duration * 100 : 0
+  const durationLabel = formatTime(Math.ceil(duration))
+  const paths = useMemo(() => peaks.map((channel, index) =>
+    waveformPath(channel, index * laneHeight + laneHeight / 2 + 6),
+  ), [peaks, laneHeight])
+  const phase = hasPrompt ? `, ${time >= promptEnd ? 'generated continuation' : 'real conversation'}` : ''
+
+  return (
+    <div className={`dac-timeline${compact ? ' dac-timeline-compact' : ''}${hasPrompt ? ' dac-timeline-prompt' : ''}`}
+      style={{ '--prompt': `${promptPercent}%`, '--wave-height': `${height}px` } as CSSProperties}>
+      <style>{waveformStyles}</style>
+      {hasPrompt && <div className='dac-regions' aria-hidden='true'><span>Real conversation</span><span>Generated continuation</span></div>}
+      <div className='dac-wave' data-channels={channelCount}>
+        {hasPrompt && <div className='dac-prompt-shade' />}
+        <svg className='dac-wave-svg' viewBox={`0 0 640 ${height}`} preserveAspectRatio='none' aria-hidden='true'>
+          <defs><clipPath id={clipId}><rect width={progress * 640} height={height} /></clipPath></defs>
+          {paths.map((path, index) => (
+            <g key={index} className='dac-channel' stroke={channels[index]?.color ?? '#3975b9'} strokeWidth={compact ? 2 : 1.3} strokeLinecap='round'>
+              {index > 0 && <path d={`M0 ${index * laneHeight}H640`} stroke='#e5e9ee' strokeWidth='1' />}
+              <path d={path} opacity={compact ? 0.55 : 0.38} />
+              <path d={path} clipPath={`url(#${clipId})`} />
+            </g>
+          ))}
+        </svg>
+        {peaks.map((_, index) => (
+          <span key={index} className='dac-speaker-label' style={{ top: `${index * laneHeight + 9}px`, color: channels[index]?.color }}>
+            {channels[index]?.label ?? `Channel ${index + 1}`} {channels[index]?.detail && <small>{channels[index].detail}</small>}
+          </span>
+        ))}
+        {hasPrompt && <div className='dac-seam' />}
+        <div className='dac-playhead' style={{ left: `${progress * 100}%` }} />
+        <input className='dac-seek' type='range' min='0' max={duration} step='any' value={clamp(time, duration)}
+          aria-label={`Seek ${label}`} aria-valuetext={`${formatTime(time)} of ${durationLabel}${phase}`}
+          onChange={(event) => onSeek(Number(event.target.value))}
+          onKeyDown={(event) => {
+            if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+              event.preventDefault()
+              onSeek(clamp(time + (event.key === 'ArrowRight' || event.key === 'ArrowUp' ? 1 : -1), duration))
+            } else if (event.key === 'Home' || event.key === 'End') {
+              event.preventDefault()
+              onSeek(event.key === 'Home' ? 0 : duration)
+            } else if (event.key === ' ') {
+              event.preventDefault()
+              onToggle()
+            }
+          }}
+        />
+      </div>
+      <div className='dac-axis' aria-hidden='true'>
+        <span>0:00</span>{hasPrompt && <span className='dac-boundary-time'>{formatTime(promptEnd)}</span>}<span>{durationLabel}</span>
+      </div>
+    </div>
+  )
+}
+
 function PlaybackIcon({ playing }: { playing: boolean }) {
   return (
     <svg viewBox='0 0 24 24' width='18' height='18' fill='currentColor' aria-hidden='true'>
@@ -65,21 +143,14 @@ function PlaybackIcon({ playing }: { playing: boolean }) {
 function AudioPlayer({ track, exampleTitle }: PlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const pendingSeek = useRef<number | null>(null)
-  const clipId = useId().replace(/:/g, '')
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(track.duration)
   const [playing, setPlaying] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const promptEnd = clamp(track.promptEnd, duration)
-  const promptPercent = duration > 0 ? promptEnd / duration * 100 : 0
-  const progress = duration > 0 ? clamp(time / duration, 1) : 0
   const durationLabel = formatTime(Math.ceil(duration))
-  const generated = time >= promptEnd
   const label = `${exampleTitle}, ${track.label}`
-  const paths = useMemo(() => speakers.map((_, channel) =>
-    waveformPath(track.peaks[channel] ?? [], channel === 0 ? 46 : 122),
-  ), [track.peaks])
   const turns = useMemo(() => speakers.map((speaker) => track.segments
     .filter((turn) => turn.speaker === speaker)
     .sort((a, b) => a.start - b.start)), [track.segments])
@@ -162,51 +233,9 @@ function AudioPlayer({ track, exampleTitle }: PlayerProps) {
         <span className='dac-stereo'>Stereo</span>
       </header>
 
-      <div className='dac-timeline' style={{ '--prompt': `${promptPercent}%` } as CSSProperties}>
-        <div className='dac-regions' aria-hidden='true'>
-          <span>Real conversation</span><span>Generated continuation</span>
-        </div>
-        <div className='dac-wave'>
-          <div className='dac-prompt-shade' />
-          <svg className='dac-wave-svg' viewBox='0 0 640 156' preserveAspectRatio='none' aria-hidden='true'>
-            <defs><clipPath id={clipId}><rect width={progress * 640} height='156' /></clipPath></defs>
-            <path d='M0 77H640' stroke='#e5e9ee' strokeWidth='1' />
-            {paths.map((path, index) => (
-              <g key={index} className={`dac-channel-${index}`} strokeWidth='1.3' strokeLinecap='round'>
-                <path d={path} opacity='0.38' />
-                <path d={path} clipPath={`url(#${clipId})`} />
-              </g>
-            ))}
-          </svg>
-          <span className='dac-speaker-label dac-speaker-a'>Speaker A <small>Left</small></span>
-          <span className='dac-speaker-label dac-speaker-b'>Speaker B <small>Right</small></span>
-          <div className='dac-seam' />
-          <div className='dac-playhead' style={{ left: `${progress * 100}%` }} />
-          <input
-            className='dac-seek'
-            type='range'
-            min='0'
-            max={duration}
-            step='any'
-            value={clamp(time, duration)}
-            aria-label={`Seek ${label}`}
-            aria-valuetext={`${formatTime(time)} of ${durationLabel}, ${generated ? 'generated continuation' : 'real conversation'}`}
-            onChange={(event) => seek(Number(event.target.value))}
-            onKeyDown={(event) => {
-              if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
-                event.preventDefault()
-                seek(time + (event.key === 'ArrowRight' || event.key === 'ArrowUp' ? 1 : -1))
-              } else if (event.key === ' ') {
-                event.preventDefault()
-                togglePlayback()
-              }
-            }}
-          />
-        </div>
-        <div className='dac-axis' aria-hidden='true'>
-          <span>0:00</span><span className='dac-boundary-time'>{formatTime(promptEnd)}</span><span>{durationLabel}</span>
-        </div>
-      </div>
+      <DialogueWaveform peaks={track.peaks} time={time} duration={duration} label={label} promptEnd={promptEnd}
+        channels={[{ label: 'Speaker A', detail: 'Left', color: '#3975b9' }, { label: 'Speaker B', detail: 'Right', color: '#cc7860' }]}
+        onSeek={seek} onToggle={togglePlayback} />
 
       <div className='dac-controls'>
         <button className='dac-play' type='button' onClick={togglePlayback} aria-label={`${playing ? 'Pause' : 'Play'} ${label}`} aria-busy={loading}>
@@ -299,6 +328,36 @@ export default function DialogueAudioSection({ id, title, description, examples 
   )
 }
 
+// Included by the waveform itself so it works without either section mounted.
+const waveformStyles = `
+.dac-timeline { min-width: 0; width: 100%; }
+.dac-timeline * { box-sizing: border-box; }
+.dac-regions { display: grid; grid-template-columns: var(--prompt) 1fr; margin-bottom: 9px; font-size: 10px; font-weight: 600; line-height: 1.4; }
+.dac-regions span:first-child { color: #768292; }
+.dac-regions span:last-child { color: #7856a4; padding-left: 10px; }
+.dac-wave { position: relative; height: var(--wave-height); border: 1px solid #e6e9ef; border-radius: 7px; overflow: hidden; background: #f8fafc; }
+.dac-timeline-prompt .dac-wave { background: #fcfaff; }
+.dac-prompt-shade { position: absolute; inset: 0 auto 0 0; width: var(--prompt); background: #f3f5f8; }
+.dac-wave-svg { display: block; position: relative; width: 100%; height: 100%; }
+.dac-speaker-label { position: absolute; left: 9px; font-size: 9px; font-weight: 600; line-height: 1; pointer-events: none; }
+.dac-speaker-label small { margin-left: 4px; font-size: 8px; font-weight: 400; color: #8490a0; }
+.dac-seam { position: absolute; top: 0; bottom: 0; left: var(--prompt); border-left: 1px dashed #947bb6; pointer-events: none; }
+.dac-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #34445b; transform: translateX(-1px); pointer-events: none; }
+.dac-seek { appearance: none; -webkit-appearance: none; position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; border-radius: 6px; background: transparent; cursor: crosshair; }
+.dac-seek::-webkit-slider-runnable-track { height: 100%; background: transparent; }
+.dac-seek::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 1px; height: 100%; background: transparent; border: 0; }
+.dac-seek::-moz-range-track { background: transparent; border: 0; }
+.dac-seek::-moz-range-progress { background: transparent; }
+.dac-seek::-moz-range-thumb { width: 1px; height: 100%; border: 0; background: transparent; }
+.dac-seek:focus { outline: none; }
+.dac-seek:focus-visible { outline: 2px solid #5375bb; outline-offset: -2px; }
+.dac-axis { display: flex; position: relative; justify-content: space-between; margin-top: 7px; color: #667386; font-size: 10px; font-variant-numeric: tabular-nums; }
+.dac-boundary-time { position: absolute; left: var(--prompt); transform: translateX(-50%); color: #82699f; }
+.dac-timeline-compact .dac-speaker-label { left: 6px; font-size: 8px; }
+.dac-timeline-compact .dac-axis { font-size: 9px; }
+@media (max-width: 540px) { .dac-regions { font-size: 9px; } }
+`
+
 // Scoped here to keep the player portable without a stylesheet dependency.
 const styles = `
 .dac-section, .dac-player { box-sizing: border-box; color: #253246; font-family: 'Trebuchet MS', Arial, sans-serif; text-align: left; }
@@ -320,30 +379,6 @@ const styles = `
 .dac-player-heading p a { color: inherit; text-decoration: none; }
 .dac-player-heading p a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .dac-stereo { border: 1px solid #e1e6ee; color: #7a8595; padding: 4px 7px; border-radius: 4px; font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
-.dac-regions { display: grid; grid-template-columns: var(--prompt) 1fr; margin-bottom: 9px; font-size: 10px; font-weight: 600; line-height: 1.4; }
-.dac-regions span:first-child { color: #768292; }
-.dac-regions span:last-child { color: #7856a4; padding-left: 10px; }
-.dac-wave { position: relative; height: 156px; border: 1px solid #e6e9ef; border-radius: 7px; overflow: hidden; background: #fcfaff; }
-.dac-prompt-shade { position: absolute; inset: 0 auto 0 0; width: var(--prompt); background: #f3f5f8; }
-.dac-wave-svg { display: block; position: relative; width: 100%; height: 100%; }
-.dac-channel-0 { stroke: #3975b9; }
-.dac-channel-1 { stroke: #cc7860; }
-.dac-speaker-label { position: absolute; left: 9px; font-size: 9px; font-weight: 600; line-height: 1; pointer-events: none; }
-.dac-speaker-label small { margin-left: 4px; font-size: 8px; font-weight: 400; color: #8490a0; }
-.dac-speaker-a { top: 9px; color: #3975b9; }
-.dac-speaker-b { top: 87px; color: #ad6049; }
-.dac-seam { position: absolute; top: 0; bottom: 0; left: var(--prompt); border-left: 1px dashed #947bb6; pointer-events: none; }
-.dac-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #34445b; transform: translateX(-1px); pointer-events: none; }
-.dac-seek { appearance: none; -webkit-appearance: none; position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; border-radius: 6px; background: transparent; cursor: crosshair; }
-.dac-seek::-webkit-slider-runnable-track { height: 100%; background: transparent; }
-.dac-seek::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 1px; height: 100%; background: transparent; border: 0; }
-.dac-seek::-moz-range-track { background: transparent; border: 0; }
-.dac-seek::-moz-range-progress { background: transparent; }
-.dac-seek::-moz-range-thumb { width: 1px; height: 100%; border: 0; background: transparent; }
-.dac-seek:focus { outline: none; }
-.dac-seek:focus-visible { outline: 2px solid #5375bb; outline-offset: -2px; }
-.dac-axis { display: flex; position: relative; justify-content: space-between; margin-top: 7px; color: #667386; font-size: 10px; font-variant-numeric: tabular-nums; }
-.dac-boundary-time { position: absolute; left: var(--prompt); transform: translateX(-50%); color: #82699f; }
 .dac-controls { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
 .dac-play { display: flex; justify-content: center; align-items: center; flex: 0 0 38px; height: 38px; padding: 0; border: 0; border-radius: 50%; background: #304969; color: #fff; }
 .dac-play:hover { background: #213852; }
@@ -373,7 +408,6 @@ const styles = `
   .dac-player { padding: 19px 14px 14px; }
   .dac-player-heading { margin-bottom: 20px; }
   .dac-player-heading h4 { font-size: 17px; }
-  .dac-regions { font-size: 9px; }
   .dac-controls { gap: 7px; }
   .dac-time { font-size: 11px; }
   .dac-jump { font-size: 10px !important; padding: 8px 6px; gap: 3px; }

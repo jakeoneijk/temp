@@ -1,0 +1,19 @@
+turns:
+  - speaker: A
+    text: All my training data is just gone!
+  - speaker: B
+    text: Don't look at me like that! I know nothing!
+  - speaker: A
+    text: Then why did you seem so nervous yesterday? Why did you
+  - speaker: B
+    text: Okay, okay, okay! It was an accident!
+    overlap: true
+  - speaker: A
+    text: An accident! I put so much effort into that! That was three months of processing, three whole months!
+  - speaker: B
+    text: Easy, man, easy!
+    interjection: true
+  - speaker: B
+    text: It's not a big deal! Just ask a coding agent to reprocess it!
+  - speaker: A
+    text: Are you insane?!

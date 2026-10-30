@@ -3,11 +3,15 @@ import './App.css'
 
 import { paperContent } from './Config/PaperContent'
 import { dialogueContinuation } from './Config/DialogueContent'
+import { dialogueGeneration } from './Config/DialogueGenerationContent'
+import { demoReferences } from './Config/References'
 
 import Title from './Component/Title'
 import AudioTable from './Source/AudioTable'
 import Section from './Component/Section'
 import DialogueAudioSection from './Component/DialogueAudioSection'
+import DialogueGenerationSection from './Component/DialogueGenerationSection'
+import References from './Component/References'
 
 const style = {
   display: 'flex',
@@ -23,17 +27,11 @@ function App() {
         <Section name='Abstract' content={paperContent.abstract} />
       )}
       <DialogueAudioSection {...dialogueContinuation} />
+      <DialogueGenerationSection {...dialogueGeneration} />
       <AudioTable audioType='Sound Effect' />
       <AudioTable audioType='Music' />
       <AudioTable audioType='Speech' />
-      {paperContent.reference.length > 0 && (
-        <Section
-          name='References'
-          content={paperContent.reference
-            .map((item, index) => `[${index + 1}] ${item}`)
-            .join(' \n ')}
-        />
-      )}
+      <References references={demoReferences} />
       <p className='content-update'>
         More content will be added.
       </p>

@@ -1,0 +1,85 @@
+{
+  "description": "Analysis-only first-utterance windows, checked against words and waveform boundaries. Never used to trim output or published in demo metadata.",
+  "files": {
+    "dialogue_continuation/dgslm/01.wav": {
+      "start": 0.3,
+      "end": 1.48,
+      "text": "What kind of car did you win?"
+    },
+    "dialogue_continuation/dgslm/02.wav": {
+      "start": 1.3,
+      "end": 2.25,
+      "text": "Craigslist. First complete utterance, selected instead of the clipped opening fragment."
+    },
+    "dialogue_continuation/ours/01.wav": {
+      "start": 0.3,
+      "end": 1.48,
+      "text": "What kind of car did you win?"
+    },
+    "dialogue_continuation/ours/02.wav": {
+      "start": 1.3,
+      "end": 2.25,
+      "text": "Craigslist. First complete utterance, selected instead of the clipped opening fragment."
+    },
+    "dialogue_generation/01_mooncast.wav": {
+      "start": 0.08,
+      "end": 2.48,
+      "text": "All my training data is just gone!"
+    },
+    "dialogue_generation/01_ours.wav": {
+      "start": 0.64,
+      "end": 3.22,
+      "text": "All my training data is just gone!"
+    },
+    "dialogue_generation/01_prompt_speakerA.wav": {
+      "start": 0.04,
+      "end": 1.1,
+      "text": "I didn't say that!"
+    },
+    "dialogue_generation/01_prompt_speakerB.wav": {
+      "start": 0.04,
+      "end": 2.12,
+      "text": "Next person, please."
+    },
+    "dialogue_generation/01_vibevoice.wav": {
+      "start": 0.72,
+      "end": 2.98,
+      "text": "All my training data is just gone!"
+    },
+    "dialogue_generation/01_zipvoice_dialog_stereo.wav": {
+      "start": 0.04,
+      "end": 2.94,
+      "text": "All my training data is just gone!"
+    },
+    "dialogue_generation/02_mooncast.wav": {
+      "start": 0.08,
+      "end": 5.08,
+      "text": "Hey, have you heard about the Spoken Dialogue Language Model that uses next token diffusion?"
+    },
+    "dialogue_generation/02_ours.wav": {
+      "start": 0.54,
+      "end": 5.82,
+      "text": "Hey, have you heard about the Spoken Dialogue Language Model that uses next token diffusion?"
+    },
+    "dialogue_generation/02_prompt_speakerA.wav": {
+      "start": 0.02,
+      "end": 2.94,
+      "text": "Wayne Rooney is a football, I mean, soccer player."
+    },
+    "dialogue_generation/02_prompt_speakerB.wav": {
+      "start": 0.1,
+      "end": 8.2,
+      "text": "Taylor Swift is an American singer, songwriter, who is known for doing mostly pop and country and folk."
+    },
+    "dialogue_generation/02_vibevoice.wav": {
+      "start": 0.06,
+      "end": 8.24,
+      "text": "Hey, have you heard about the Spoken Dialogue Language Model that uses next token diffusion?"
+    },
+    "dialogue_generation/02_zipvoice_dialog_stereo.wav": {
+      "start": 0.04,
+      "end": 6.32,
+      "text": "Hey, have you heard about the Spoken Dialogue Language Model that uses next token diffusion?"
+    }
+  }
+}

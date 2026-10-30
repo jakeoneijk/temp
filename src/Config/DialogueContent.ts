@@ -1,4 +1,5 @@
 import type { DialogueAudioTrack, DialogueExample } from '../Component/DialogueAudioSection'
+import { citationFor, modelReferences } from './References'
 import ours01Audio from '../Source/audio/dialogue_continuation/ours/01.wav'
 import ours02Audio from '../Source/audio/dialogue_continuation/ours/02.wav'
 import dgslm01Audio from '../Source/audio/dialogue_continuation/dgslm/01.wav'
@@ -15,6 +16,8 @@ type ClipMetadata = {
   segments: DialogueAudioTrack['segments']
 }
 
+const dgslmCitation = citationFor(modelReferences.dgslm)
+
 const models = {
   ours: {
     label: 'CSDLM (Ours)',
@@ -22,8 +25,8 @@ const models = {
   },
   dgslm: {
     label: 'dGSLM',
-    description: '(Nguyen et al., 2023)',
-    descriptionHref: 'https://aclanthology.org/2023.tacl-1.15/',
+    description: dgslmCitation.label,
+    descriptionHref: dgslmCitation.href,
   },
 }
 
