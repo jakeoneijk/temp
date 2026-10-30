@@ -1,15 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { DialogueWaveform } from './DialogueAudioSection'
+import WaveformAudioPlayer, { type WaveformAudio } from './WaveformAudioPlayer'
 
-export type GenerationAudio = {
-  id: string
-  label: string
-  src: string
-  duration: number
-  channels: number
-  peaks: readonly (readonly number[])[]
-  citation?: { label: string; href: string }
-}
+export type GenerationAudio = WaveformAudio
 
 export type DialogueGenerationExample = {
   id: string
@@ -24,124 +15,6 @@ type SectionProps = {
   title: string
   description: string
   examples: readonly DialogueGenerationExample[]
-}
-
-const clamp = (time: number, duration: number) => Math.min(duration, Math.max(0, time))
-const formatTime = (time: number) => `${Math.floor(time / 60)}:${String(Math.floor(time % 60)).padStart(2, '0')}`
-
-// Native media playback keeps the module portable to static and anonymous hosts.
-function GenerationWaveformPlayer({ audio, exampleTitle, showChannels = false }: {
-  audio: GenerationAudio
-  exampleTitle: string
-  showChannels?: boolean
-}) {
-  const mediaRef = useRef<HTMLAudioElement>(null)
-  const pendingSeek = useRef<number | null>(null)
-  const [time, setTime] = useState(0)
-  const [duration, setDuration] = useState(audio.duration)
-  const [playing, setPlaying] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const label = `${exampleTitle}, ${audio.label}`
-  const durationLabel = formatTime(Math.ceil(duration))
-  const elapsedLabel = time >= duration ? durationLabel : formatTime(time)
-
-  useEffect(() => {
-    const media = mediaRef.current
-    const pauseForOtherMedia = (event: Event) => {
-      if (event.target instanceof HTMLMediaElement && event.target !== media) media?.pause()
-    }
-    document.addEventListener('play', pauseForOtherMedia, true)
-    return () => {
-      document.removeEventListener('play', pauseForOtherMedia, true)
-      media?.pause()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!playing) return
-    let frame = 0
-    const update = () => {
-      if (mediaRef.current) setTime(mediaRef.current.currentTime)
-      frame = requestAnimationFrame(update)
-    }
-    frame = requestAnimationFrame(update)
-    return () => cancelAnimationFrame(frame)
-  }, [playing])
-
-  function seek(seconds: number) {
-    const media = mediaRef.current
-    if (!media) return
-    const next = clamp(seconds, duration)
-    pendingSeek.current = media.readyState === 0 ? next : null
-    media.currentTime = next
-    setTime(next)
-  }
-
-  async function togglePlayback() {
-    const media = mediaRef.current
-    if (!media) return
-    if (!media.paused) {
-      media.pause()
-      return
-    }
-    setError('')
-    setLoading(true)
-    try {
-      if (media.error) media.load()
-      if (media.ended || media.currentTime >= duration) seek(0)
-      await media.play()
-    } catch (cause) {
-      if (!(cause instanceof DOMException && cause.name === 'AbortError')) {
-        setError('Audio could not be played. Please try again.')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className='dgen-audio' role='group' aria-label={label}>
-      <DialogueWaveform peaks={audio.peaks} time={time} duration={duration} label={label} compact reserveStereoHeight={showChannels}
-        channels={audio.channels === 1
-          ? [{ label: 'Mono', color: audio.id === 'speaker-b' ? '#cc7860' : audio.id === 'speaker-a' ? '#3975b9' : '#647994' }]
-          : [{ label: 'Left', color: '#3975b9' }, { label: 'Right', color: '#cc7860' }]}
-        onSeek={seek} onToggle={() => void togglePlayback()} />
-      <div className='dgen-transport'>
-        <button type='button' className='dgen-play' onClick={() => void togglePlayback()} aria-label={`${playing ? 'Pause' : 'Play'} ${label}`} aria-busy={loading}>
-          <svg viewBox='0 0 24 24' width='15' height='15' fill='currentColor' aria-hidden='true'>
-            {playing ? <path d='M6 4h4v16H6zm8 0h4v16h-4z' /> : <path d='m7 3 15 9-15 9z' />}
-          </svg>
-        </button>
-        <span className='dgen-time'>{elapsedLabel} <span>/ {durationLabel}</span></span>
-      </div>
-      {showChannels && <span className='dgen-channels'>{audio.channels === 1 ? 'Mono' : audio.channels === 2 ? 'Stereo' : `${audio.channels} channels`}</span>}
-      {error && <p className='dgen-error' role='alert'>{error}</p>}
-      <audio
-        ref={mediaRef}
-        src={audio.src}
-        preload='metadata'
-        onLoadedMetadata={(event) => {
-          const media = event.currentTarget
-          if (Number.isFinite(media.duration) && media.duration > 0) {
-            setDuration(media.duration)
-            if (pendingSeek.current !== null) {
-              media.currentTime = clamp(pendingSeek.current, media.duration)
-              pendingSeek.current = null
-            }
-          }
-        }}
-        onTimeUpdate={(event) => setTime(event.currentTarget.currentTime)}
-        onPlay={() => setPlaying(true)}
-        onPlaying={() => { setPlaying(true); setLoading(false) }}
-        onPause={(event) => { setPlaying(false); setLoading(false); setTime(event.currentTarget.currentTime) }}
-        onWaiting={() => setLoading(true)}
-        onCanPlay={() => setLoading(false)}
-        onEnded={() => { setPlaying(false); setLoading(false) }}
-        onError={() => { setPlaying(false); setLoading(false); setError('Audio could not be loaded. Please try again.') }}
-      />
-    </div>
-  )
 }
 
 // Script, reference voices, and model outputs share one reusable section module.
@@ -183,7 +56,7 @@ export default function DialogueGenerationSection({ id, title, description, exam
                   {example.prompts.map((prompt) => (
                     <div key={`${prompt.id}-${prompt.src}`} className={`dgen-prompt dgen-${prompt.id}`}>
                       <h5>{prompt.label}</h5>
-                      <GenerationWaveformPlayer audio={prompt} exampleTitle={example.title} />
+                      <WaveformAudioPlayer audio={prompt} exampleTitle={example.title} />
                     </div>
                   ))}
                 </div>
@@ -195,7 +68,7 @@ export default function DialogueGenerationSection({ id, title, description, exam
                     {output.citation && <a href={output.citation.href} target='_blank' rel='noopener noreferrer'>{output.citation.label}</a>}
                   </h4>
                   <div className='dgen-cell-body'>
-                    <GenerationWaveformPlayer audio={output} exampleTitle={example.title} showChannels />
+                    <WaveformAudioPlayer audio={output} exampleTitle={example.title} showChannels />
                   </div>
                 </div>
               ))}
@@ -235,14 +108,6 @@ const styles = `
 .dgen-interjection { background: #eaf5f2; color: #34756a; }
 .dgen-prompt h5 { margin: 0 0 10px; color: #3975b9; font-size: 11px; font-weight: 600; }
 .dgen-speaker-b h5 { color: #ad6049; }
-.dgen-audio { min-width: 0; width: 100%; }
-.dgen-transport { display: flex; align-items: center; gap: 7px; margin-top: 12px; }
-.dgen-play { display: flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #304969; color: #fff; }
-.dgen-play:hover { background: #213852; }
-.dgen-time { color: #415069; white-space: nowrap; font-size: 10px; font-variant-numeric: tabular-nums; }
-.dgen-time > span { color: #758092; }
-.dgen-channels { display: block; margin-top: 7px; color: #758092; font-size: 10px; }
-.dgen-error { margin: 8px 0 0; color: #a63b3b; font-size: 11px; line-height: 1.5; }
 .dgen-output-ours { background: #fbfcfe; }
 .dgen-output-ours > h4 { background: #edf2f8; color: #304969; }
 @media (max-width: 1000px) {
@@ -253,7 +118,7 @@ const styles = `
   .dgen-output:nth-child(odd) { border-left: 0; }
   .dgen-prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   .dgen-cell-body { padding: 20px; }
-  .dgen-time { font-size: 12px; }
+  .dgen-section .wap-time { font-size: 12px; }
 }
 @media (max-width: 540px) {
   .dgen-section { padding: 32px 20px 12px; }
@@ -261,6 +126,6 @@ const styles = `
   .dgen-cell { border-left: 0; }
   .dgen-cell > h4 { align-items: flex-start; padding: 10px 16px; text-align: left; }
   .dgen-prompts { gap: 18px; padding: 20px 16px; }
-  .dgen-time { font-size: 10px; }
+  .dgen-section .wap-time { font-size: 10px; }
 }
 `
