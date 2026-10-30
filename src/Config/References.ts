@@ -12,6 +12,26 @@ export type PaperReference = {
 }
 
 export const modelReferences = {
+  cosyvoice2: {
+    id: 'cosyvoice2',
+    shortAuthors: 'Du et al.',
+    authors: 'Zhihao Du, Yuxuan Wang, Qian Chen, Xian Shi, Xiang Lv, Tianyu Zhao, Zhifu Gao, Yexin Yang, Changfeng Gao, Hui Wang, Fan Yu, Huadai Liu, Zhengyan Sheng, Yue Gu, Chong Deng, Wen Wang, Shiliang Zhang, Zhijie Yan, and Jingren Zhou',
+    title: 'CosyVoice 2: Scalable streaming speech synthesis with large language models',
+    venue: 'arXiv preprint arXiv:2412.10117',
+    year: 2024,
+    href: 'https://arxiv.org/abs/2412.10117',
+    kind: 'preprint',
+  },
+  cosyvoice3: {
+    id: 'cosyvoice3',
+    shortAuthors: 'Du et al.',
+    authors: 'Zhihao Du, Changfeng Gao, Yuxuan Wang, Fan Yu, Tianyu Zhao, Hao Wang, Xiang Lv, Hui Wang, Chongjia Ni, Xian Shi, Keyu An, Guanrou Yang, Yabin Li, Yanni Chen, Zhifu Gao, Qian Chen, Yue Gu, Mengzhe Chen, Yafeng Chen, Shiliang Zhang, Wen Wang, and Jieping Ye',
+    title: 'CosyVoice 3: Towards in-the-wild speech generation via scaling-up and post-training',
+    venue: 'arXiv preprint arXiv:2505.17589',
+    year: 2025,
+    href: 'https://arxiv.org/abs/2505.17589',
+    kind: 'preprint',
+  },
   dgslm: {
     id: 'dgslm',
     shortAuthors: 'Nguyen et al.',
@@ -46,6 +66,16 @@ export const modelReferences = {
     href: 'https://arxiv.org/abs/2508.19205',
     kind: 'preprint',
   },
+  voxtream2: {
+    id: 'voxtream2',
+    shortAuthors: 'Torgashov et al.',
+    authors: 'Nikita Torgashov, Gustav Eje Henter, and Gabriel Skantze',
+    title: 'VoXtream2: Full-stream TTS with dynamic speaking rate control',
+    venue: 'arXiv preprint arXiv:2603.13518',
+    year: 2026,
+    href: 'https://arxiv.org/abs/2603.13518',
+    kind: 'preprint',
+  },
   zipvoice: {
     id: 'zipvoice',
     shortAuthors: 'Zhu et al.',
@@ -60,10 +90,13 @@ export const modelReferences = {
 } satisfies Record<string, PaperReference>
 
 export const demoReferences: readonly PaperReference[] = [
-  modelReferences.mooncast,
   modelReferences.dgslm,
+  modelReferences.mooncast,
   modelReferences.vibevoice,
   modelReferences.zipvoice,
+  modelReferences.cosyvoice2,
+  modelReferences.cosyvoice3,
+  modelReferences.voxtream2,
 ]
 
 export function citationFor(reference: PaperReference): { label: string; href: string } {

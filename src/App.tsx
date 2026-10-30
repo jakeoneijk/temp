@@ -5,6 +5,7 @@ import { paperContent } from './Config/PaperContent'
 import { dialogueContinuation } from './Config/DialogueContent'
 import { dialogueGeneration } from './Config/DialogueGenerationContent'
 import { contextualTts } from './Config/ContextualTtsContent'
+import { streamingTts } from './Config/StreamingTtsContent'
 import { demoReferences } from './Config/References'
 
 import Title from './Component/Title'
@@ -13,6 +14,7 @@ import Section from './Component/Section'
 import DialogueAudioSection from './Component/DialogueAudioSection'
 import DialogueGenerationSection from './Component/DialogueGenerationSection'
 import ContextualTtsSection from './Component/ContextualTtsSection'
+import StreamingTtsSection from './Component/StreamingTtsSection'
 import References from './Component/References'
 
 const style = {
@@ -31,6 +33,7 @@ function App() {
       <DialogueAudioSection {...dialogueContinuation} />
       <DialogueGenerationSection {...dialogueGeneration} />
       <ContextualTtsSection {...contextualTts} />
+      <StreamingTtsSection {...streamingTts} />
       <AudioTable audioType='Sound Effect' />
       <AudioTable audioType='Music' />
       <AudioTable audioType='Speech' />

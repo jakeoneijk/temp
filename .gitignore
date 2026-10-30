@@ -23,3 +23,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local audio work and temporary verification artifacts
+/.local-audio/
+csdlm-*.json
+csdlm-*.py
