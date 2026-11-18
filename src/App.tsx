@@ -12,6 +12,7 @@ import Title from './Component/Title'
 import AudioTable from './Source/AudioTable'
 import Section from './Component/Section'
 import DialogueAudioSection from './Component/DialogueAudioSection'
+import ListeningStudySection from './Component/ListeningStudySection'
 import DialogueGenerationSection from './Component/DialogueGenerationSection'
 import ContextualTtsSection from './Component/ContextualTtsSection'
 import StreamingTtsSection from './Component/StreamingTtsSection'
@@ -30,7 +31,9 @@ function App() {
       {paperContent.abstract.trim() && (
         <Section name='Abstract' content={paperContent.abstract} />
       )}
-      <DialogueAudioSection {...dialogueContinuation} />
+      <DialogueAudioSection {...dialogueContinuation}>
+        <ListeningStudySection />
+      </DialogueAudioSection>
       <DialogueGenerationSection {...dialogueGeneration} />
       <ContextualTtsSection {...contextualTts} />
       <StreamingTtsSection {...streamingTts} />

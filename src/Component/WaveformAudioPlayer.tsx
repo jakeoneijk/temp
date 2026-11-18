@@ -8,6 +8,8 @@ export type WaveformAudio = {
   duration: number
   channels: number
   peaks: readonly (readonly number[])[]
+  promptEnd?: number
+  continuationLabel?: string
   citation?: { label: string; href: string }
 }
 
@@ -63,18 +65,15 @@ export default function WaveformAudioPlayer({ audio, exampleTitle, showChannels 
     setTime(next)
   }
 
-  async function togglePlayback() {
+  async function play(from?: number) {
     const media = mediaRef.current
     if (!media) return
-    if (!media.paused) {
-      media.pause()
-      return
-    }
     setError('')
     setLoading(true)
     try {
       if (media.error) media.load()
-      if (media.ended || media.currentTime >= duration) seek(0)
+      if (from !== undefined) seek(from)
+      else if (media.ended || media.currentTime >= duration) seek(0)
       await media.play()
     } catch (cause) {
       if (!(cause instanceof DOMException && cause.name === 'AbortError')) {
@@ -85,10 +84,18 @@ export default function WaveformAudioPlayer({ audio, exampleTitle, showChannels 
     }
   }
 
+  async function togglePlayback() {
+    const media = mediaRef.current
+    if (!media) return
+    if (!media.paused) media.pause()
+    else await play()
+  }
+
   return (
     <div className='wap-audio' role='group' aria-label={label}>
       <style>{styles}</style>
       <DialogueWaveform peaks={audio.peaks} time={time} duration={duration} label={label} compact reserveStereoHeight={showChannels}
+        promptEnd={audio.promptEnd} continuationLabel={audio.continuationLabel}
         channels={audio.channels === 1
           ? [{ label: 'Mono', color: audio.id === 'speaker-b' ? '#cc7860' : audio.id === 'speaker-a' ? '#3975b9' : '#647994' }]
           : [{ label: 'Left', color: '#3975b9' }, { label: 'Right', color: '#cc7860' }]}
@@ -100,6 +107,8 @@ export default function WaveformAudioPlayer({ audio, exampleTitle, showChannels 
           </svg>
         </button>
         <span className='wap-time'>{elapsedLabel} <span>/ {durationLabel}</span></span>
+        {audio.promptEnd !== undefined && <button type='button' className='wap-continuation'
+          onClick={() => void play(audio.promptEnd)} aria-label={`Play continuation, ${label}`}>Play continuation</button>}
       </div>
       {showChannels && <span className='wap-channels'>{audio.channels === 1 ? 'Mono' : audio.channels === 2 ? 'Stereo' : `${audio.channels} channels`}</span>}
       {error && <p className='wap-error' role='alert'>{error}</p>}
@@ -135,9 +144,11 @@ const styles = `
 .wap-audio button { font: inherit; cursor: pointer; }
 .wap-audio button:focus-visible { outline: 3px solid #5375bb; outline-offset: 3px; }
 .wap-audio { min-width: 0; width: 100%; }
-.wap-transport { display: flex; align-items: center; gap: 7px; margin-top: 12px; }
+.wap-transport { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 12px; }
 .wap-play { display: flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #304969; color: #fff; }
 .wap-play:hover { background: #213852; }
+.wap-continuation { min-height: 36px; margin-left: auto; padding: 6px 10px; border: 1px solid #d4dde9; border-radius: 6px; color: #304969; background: #f3f6fa; font-size: 11px !important; }
+.wap-continuation:hover { background: #e8eef7; }
 .wap-time { color: #415069; white-space: nowrap; font-size: 10px; font-variant-numeric: tabular-nums; }
 .wap-time > span { color: #758092; }
 .wap-channels { display: block; margin-top: 7px; color: #758092; font-size: 10px; }

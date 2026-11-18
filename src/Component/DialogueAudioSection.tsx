@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 export type DialogueSegment = {
   speaker: string
@@ -34,6 +34,7 @@ type SectionProps = {
   title: string
   description: string
   examples: readonly DialogueExample[]
+  children?: ReactNode
 }
 
 const speakers = ['A', 'B'] as const
@@ -58,7 +59,7 @@ type WaveformChannel = { label: string; detail?: string; color: string }
 
 // Shared by continuation and generation. Each real audio channel gets one lane;
 // generation has no prompt boundary or synthetic caption timestamps.
-export function DialogueWaveform({ peaks, time, duration, label, channels, promptEnd,
+export function DialogueWaveform({ peaks, time, duration, label, channels, promptEnd, continuationLabel = 'Generated continuation',
   compact = false, reserveStereoHeight = false, onSeek, onToggle }: {
   peaks: readonly (readonly number[])[]
   time: number
@@ -66,6 +67,7 @@ export function DialogueWaveform({ peaks, time, duration, label, channels, promp
   label: string
   channels: readonly WaveformChannel[]
   promptEnd?: number
+  continuationLabel?: string
   compact?: boolean
   reserveStereoHeight?: boolean
   onSeek: (time: number) => void
@@ -82,13 +84,13 @@ export function DialogueWaveform({ peaks, time, duration, label, channels, promp
   const paths = useMemo(() => peaks.map((channel, index) =>
     waveformPath(channel, index * laneHeight + laneHeight / 2 + 6),
   ), [peaks, laneHeight])
-  const phase = hasPrompt ? `, ${time >= promptEnd ? 'generated continuation' : 'real conversation'}` : ''
+  const phase = hasPrompt ? `, ${time >= promptEnd ? continuationLabel.toLowerCase() : 'real conversation'}` : ''
 
   return (
     <div className={`dac-timeline${compact ? ' dac-timeline-compact' : ''}${hasPrompt ? ' dac-timeline-prompt' : ''}`}
       style={{ '--prompt': `${promptPercent}%`, '--wave-height': `${height}px` } as CSSProperties}>
       <style>{waveformStyles}</style>
-      {hasPrompt && <div className='dac-regions' aria-hidden='true'><span>Real conversation</span><span>Generated continuation</span></div>}
+      {hasPrompt && <div className='dac-regions' aria-hidden='true'><span>Real conversation</span><span>{continuationLabel}</span></div>}
       <div className='dac-wave' data-channels={channelCount}>
         {hasPrompt && <div className='dac-prompt-shade' />}
         <svg className='dac-wave-svg' viewBox={`0 0 640 ${height}`} preserveAspectRatio='none' aria-hidden='true'>
@@ -300,7 +302,7 @@ export function DialogueAudioPlayer(props: PlayerProps) {
   return <><style>{styles}</style><AudioPlayer key={props.track.src} {...props} /></>
 }
 
-export default function DialogueAudioSection({ id, title, description, examples }: SectionProps) {
+export default function DialogueAudioSection({ id, title, description, examples, children }: SectionProps) {
   if (examples.length === 0) return null
 
   return (
@@ -324,6 +326,7 @@ export default function DialogueAudioSection({ id, title, description, examples 
           </section>
         ))}
       </div>
+      {children}
     </section>
   )
 }
