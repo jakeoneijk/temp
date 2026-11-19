@@ -31,6 +31,18 @@ function App() {
       {paperContent.abstract.trim() && (
         <Section name='Abstract' content={paperContent.abstract} />
       )}
+      <section className='demo-video' aria-label='CSDLM demo video'>
+        <iframe
+          className='demo-video__player'
+          src='https://www.youtube.com/embed/z6Su0rLMCig?si=YcoEYq_zSGyEw37D'
+          title='Continuous Spoken Dialogue Language Models — Demo'
+          width='1064'
+          height='599'
+          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+          referrerPolicy='strict-origin-when-cross-origin'
+          allowFullScreen
+        />
+      </section>
       <DialogueAudioSection {...dialogueContinuation}>
         <ListeningStudySection />
       </DialogueAudioSection>

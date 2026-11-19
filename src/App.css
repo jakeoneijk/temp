@@ -1,3 +1,18 @@
+.demo-video {
+  width: min(1064px, calc(100% - 40px));
+  margin: 28px 20px 8px;
+}
+
+.demo-video__player {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+  background: #f3f6fa;
+}
+
 .content-update {
   box-sizing: border-box;
   width: min(1064px, calc(100% - 40px));
